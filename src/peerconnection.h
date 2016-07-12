@@ -144,11 +144,13 @@ class PeerConnection
   static NAN_METHOD(UpdateIce);
   static NAN_METHOD(AddIceCandidate);
   static NAN_METHOD(CreateDataChannel);
+  /*
   static NAN_METHOD(GetLocalStreams);
   static NAN_METHOD(GetRemoteStreams);
   static NAN_METHOD(GetStreamById);
   static NAN_METHOD(AddStream);
   static NAN_METHOD(RemoveStream);
+  */
   static NAN_METHOD(GetStats);
   static NAN_METHOD(Close);
 

@@ -11,7 +11,6 @@
 #include "create-answer-observer.h"
 #include "create-offer-observer.h"
 #include "datachannel.h"
-#include "mediastream.h"
 #include "rtcstatsresponse.h"
 #include "set-local-description-observer.h"
 #include "set-remote-description-observer.h"
@@ -173,32 +172,7 @@ void PeerConnection::Run(uv_async_t* handle, int status) {
       Local<Value> argv[1];
       argv[0] = dc;
       Nan::MakeCallback(pc, callback, 1, argv);
-    } else if(PeerConnection::NOTIFY_ADD_STREAM & evt.type) {
-      webrtc::MediaStreamInterface* msi = static_cast<webrtc::MediaStreamInterface*>(evt.data);
-      Local<Value> cargv[1];
-      cargv[0] = Nan::New<External>(static_cast<void*>(msi));
-      Local<Value> ms = Nan::New(MediaStream::constructor)->NewInstance(1, cargv);
-
-      Local<Function> callback = Local<Function>::Cast(pc->Get(Nan::New("onaddstream").ToLocalChecked()));
-      if(!callback.IsEmpty())
-      {
-        Local<Value> argv[1];
-        argv[0] = ms;
-        Nan::MakeCallback(pc, callback, 1, argv);
-      }
-    } else if(PeerConnection::NOTIFY_REMOVE_STREAM & evt.type) {
-      webrtc::MediaStreamInterface* msi = static_cast<webrtc::MediaStreamInterface*>(evt.data);
-      Local<Value> cargv[1];
-      cargv[0] = Nan::New<External>(static_cast<void*>(msi));
-      Local<Value> ms = Nan::New(MediaStream::constructor)->NewInstance(1, cargv);
-
-      Local<Function> callback = Local<Function>::Cast(pc->Get(Nan::New("onremovestream").ToLocalChecked()));
-      if(!callback.IsEmpty())
-      {
-        Local<Value> argv[1];
-        argv[0] = ms;
-        Nan::MakeCallback(pc, callback, 1, argv);
-      }
+    }
   }
 
   if (do_shutdown) {
@@ -231,20 +205,6 @@ void PeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGa
   TRACE_CALL;
   StateEvent* data = new StateEvent(static_cast<uint32_t>(new_state));
   QueueEvent(PeerConnection::ICE_GATHERING_STATE_CHANGE, static_cast<void*>(data));
-  TRACE_END;
-}
-
-void PeerConnection::OnAddStream( webrtc::MediaStreamInterface* media_stream ) {
-  TRACE_CALL;
-  media_stream->AddRef();
-  QueueEvent(PeerConnection::NOTIFY_ADD_STREAM, static_cast<void*>(media_stream));
-  TRACE_END;
-}
-
-void PeerConnection::OnRemoveStream( webrtc::MediaStreamInterface* media_stream ) {
-  TRACE_CALL;
-  media_stream->AddRef();
-  QueueEvent(PeerConnection::NOTIFY_REMOVE_STREAM, static_cast<void*>(media_stream));
   TRACE_END;
 }
 
@@ -445,88 +405,6 @@ NAN_METHOD(PeerConnection::GetStats) {
   info.GetReturnValue().Set(Nan::Undefined());
 }
 
-NAN_METHOD(PeerConnection::AddStream) {
-  TRACE_CALL;
-
-  PeerConnection* self = Nan::ObjectWrap::Unwrap<PeerConnection>(info.This());
-  MediaStream* ms = Nan::ObjectWrap::Unwrap<MediaStream>(info[0]->ToObject());
-  Handle<Object> constraintsDict = Handle<Object>::Cast(info[1]);
-
-
-  TRACE_END;
-  info.GetReturnValue().Set(Nan::Undefined());
-}
-
-NAN_METHOD(PeerConnection::RemoveStream) {
-  TRACE_CALL;
-
-  PeerConnection* self = Nan::ObjectWrap::Unwrap<PeerConnection>(info.This());
-  MediaStream* ms = Nan::ObjectWrap::Unwrap<MediaStream>(info[0]->ToObject());
-
-  self->_jinglePeerConnection->RemoveStream(ms->GetInterface());
-
-  TRACE_END;
-  info.GetReturnValue().Set(Nan::Undefined());
-}
-
-NAN_METHOD(PeerConnection::GetLocalStreams) {
-  TRACE_CALL;
-
-  PeerConnection* self = Nan::ObjectWrap::Unwrap<PeerConnection>(info.This());
-  rtc::scoped_refptr<webrtc::StreamCollectionInterface> _streams = self->_jinglePeerConnection->local_streams();
-
-  Local<Array> array = Nan::New<Array>(_streams->count());
-  for (unsigned int index = 0; index < _streams->count(); index++) {
-    Local<Value> cargv[1];
-    cargv[0] = Nan::New<External>(static_cast<void*>(_streams->at(index)));
-    array->Set(index, Nan::New(MediaStream::constructor)->NewInstance(1, cargv));
-  }
-
-  TRACE_END;
-  info.GetReturnValue().Set(array);
-}
-
-NAN_METHOD(PeerConnection::GetRemoteStreams) {
-  TRACE_CALL;
-
-  PeerConnection* self = Nan::ObjectWrap::Unwrap<PeerConnection>(info.This());
-  rtc::scoped_refptr<webrtc::StreamCollectionInterface> _streams = self->_jinglePeerConnection->remote_streams();
-
-  Local<Array> array = Nan::New<Array>(_streams->count());
-  for (unsigned int index = 0; index < _streams->count(); index++) {
-    Local<Value> cargv[1];
-    cargv[0] = Nan::New<External>(static_cast<void*>(_streams->at(index)));
-    array->Set(index, Nan::New(MediaStream::constructor)->NewInstance(1, cargv));
-  }
-
-  TRACE_END;
-  info.GetReturnValue().Set(array);
-}
-
-NAN_METHOD(PeerConnection::GetStreamById) {
-  TRACE_CALL;
-
-  PeerConnection* self = Nan::ObjectWrap::Unwrap<PeerConnection>(info.This());
-  String::Utf8Value param1(info[0]->ToString());
-  std::string _id = std::string(*param1);
-  rtc::scoped_refptr<webrtc::StreamCollectionInterface> _local = self->_jinglePeerConnection->local_streams();
-  rtc::scoped_refptr<webrtc::StreamCollectionInterface> _remote = self->_jinglePeerConnection->remote_streams();
-  webrtc::MediaStreamInterface* stream = _local->find(_id);
-  if (!stream) {
-      stream = _remote->find(_id);
-  }
-
-  TRACE_END;
-  if (stream) {
-    Local<Value> cargv[1];
-    cargv[0] = Nan::New<External>(static_cast<void*>(stream));
-    Local<Value> ms = Nan::New(MediaStream::constructor)->NewInstance(1, cargv);
-    info.GetReturnValue().Set(ms);
-  } else {
-    info.GetReturnValue().Set(Nan::Undefined());
-  }
-}
-
 NAN_METHOD(PeerConnection::UpdateIce) {
   TRACE_CALL;
   TRACE_END;
@@ -639,12 +517,6 @@ void PeerConnection::Init(Handle<Object> exports) {
   Nan::SetPrototypeMethod(tpl, "updateIce", UpdateIce);
   Nan::SetPrototypeMethod(tpl, "addIceCandidate", AddIceCandidate);
   Nan::SetPrototypeMethod(tpl, "createDataChannel", CreateDataChannel);
-  Nan::SetPrototypeMethod(tpl, "getLocalStreams", GetLocalStreams);
-  Nan::SetPrototypeMethod(tpl, "getRemoteStreams", GetRemoteStreams);
-  Nan::SetPrototypeMethod(tpl, "getStreamById", GetStreamById);
-  Nan::SetPrototypeMethod(tpl, "addStream", AddStream);
-  Nan::SetPrototypeMethod(tpl, "removeStream", RemoveStream);
-  Nan::SetPrototypeMethod(tpl, "addStream", AddStream);
   Nan::SetPrototypeMethod(tpl, "close", Close);
 
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("localDescription").ToLocalChecked(), GetLocalDescription, ReadOnly);
