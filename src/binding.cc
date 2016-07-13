@@ -17,6 +17,7 @@
 
 using v8::Handle;
 using v8::Object;
+using v8::FunctionTemplate;
 
 static rtc::Thread signalingThread;
 static rtc::Thread workerThread;
@@ -48,8 +49,10 @@ void init(Handle<Object> exports) {
   node_webrtc::DataChannel::Init(exports);
   MediaStream::Init(exports);
   MediaStreamTrack::Init(exports);
-  exports->Set( String::NewSymbol("getUserMedia"),
-    FunctionTemplate::New( GetUserMedia )->GetFunction() );
+
+  exports->Set(Nan::New("getUserMedia").ToLocalChecked(), 
+    Nan::New<FunctionTemplate>(GetUserMedia)->GetFunction());
+
   node_webrtc::RTCStatsReport::Init(exports);
   node_webrtc::RTCStatsResponse::Init(exports);
   node::AtExit(dispose);
