@@ -18,6 +18,7 @@
 #include "stats-observer.h"
 
 using node_webrtc::PeerConnection;
+using v8::Array;
 using v8::External;
 using v8::Function;
 using v8::FunctionTemplate;
