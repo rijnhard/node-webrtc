@@ -243,20 +243,6 @@ void PeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGa
   TRACE_END;
 }
 
-void PeerConnection::OnAddStream( webrtc::MediaStreamInterface* media_stream ) {
-  TRACE_CALL;
-  media_stream->AddRef();
-  QueueEvent(PeerConnection::NOTIFY_ADD_STREAM, static_cast<void*>(media_stream));
-  TRACE_END;
-}
-
-void PeerConnection::OnRemoveStream( webrtc::MediaStreamInterface* media_stream ) {
-  TRACE_CALL;
-  media_stream->AddRef();
-  QueueEvent(PeerConnection::NOTIFY_REMOVE_STREAM, static_cast<void*>(media_stream));
-  TRACE_END;
-}
-
 void PeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
   TRACE_CALL;
   PeerConnection::IceEvent* data = new PeerConnection::IceEvent(candidate);
@@ -272,13 +258,17 @@ void PeerConnection::OnDataChannel(webrtc::DataChannelInterface* jingle_data_cha
   TRACE_END;
 }
 
-void PeerConnection::OnAddStream(webrtc::MediaStreamInterface* stream) {
+void PeerConnection::OnAddStream( webrtc::MediaStreamInterface* media_stream ) {
   TRACE_CALL;
+  media_stream->AddRef();
+  QueueEvent(PeerConnection::NOTIFY_ADD_STREAM, static_cast<void*>(media_stream));
   TRACE_END;
 }
 
-void PeerConnection::OnRemoveStream(webrtc::MediaStreamInterface* stream) {
+void PeerConnection::OnRemoveStream( webrtc::MediaStreamInterface* media_stream ) {
   TRACE_CALL;
+  media_stream->AddRef();
+  QueueEvent(PeerConnection::NOTIFY_REMOVE_STREAM, static_cast<void*>(media_stream));
   TRACE_END;
 }
 
