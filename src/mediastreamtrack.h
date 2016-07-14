@@ -3,22 +3,20 @@
 
 #include <string>
 
-#include <node.h>
-#include <v8.h>
-#include <node_object_wrap.h>
-#include <uv.h>
+#include "nan.h"
+#include "uv.h"
+#include "v8.h"  // IWYU pragma: keep
 
-#include "talk/app/webrtc/jsep.h"
-#include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/thread.h"
-#include "talk/base/scoped_ptr.h"
-#include "webrtc/system_wrappers/interface/ref_count.h"
+#include "webrtc/api/jsep.h"
+#include "webrtc/api/mediastreaminterface.h"
+#include "webrtc/base/scoped_ref_ptr.h"
 
 #include "common.h"
 #include "nan.h"
 
-using namespace node;
-using namespace v8;
+using v8::Function;
+using v8::Handle;
+using v8::Object;
 
 class MediaStreamTrack
 : public Nan::ObjectWrap,
@@ -85,7 +83,7 @@ private:
   bool _live;
   bool _muted;
   
-  talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface> _internalMediaStreamTrack;
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> _internalMediaStreamTrack;
 };
 
 #endif

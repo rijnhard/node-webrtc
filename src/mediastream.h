@@ -4,22 +4,17 @@
 #include <queue>
 #include <string>
 
-#include <node.h>
-#include <v8.h>
-#include <node_object_wrap.h>
-#include <uv.h>
-
-#include "talk/app/webrtc/jsep.h"
-#include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/thread.h"
-#include "talk/base/scoped_ptr.h"
-#include "webrtc/system_wrappers/interface/ref_count.h"
-
-#include "common.h"
 #include "nan.h"
+#include "uv.h"
+#include "v8.h"  // IWYU pragma: keep
 
-using namespace node;
-using namespace v8;
+#include "webrtc/api/jsep.h"
+#include "webrtc/api/mediastreaminterface.h"
+#include "webrtc/base/scoped_ref_ptr.h"
+
+using v8::Function;
+using v8::Handle;
+using v8::Object;
 
 class MediaStream
 : public Nan::ObjectWrap,
@@ -83,7 +78,7 @@ private:
 
   bool _inactive;
   
-  talk_base::scoped_refptr<webrtc::MediaStreamInterface> _internalMediaStream;
+  rtc::scoped_refptr<webrtc::MediaStreamInterface> _internalMediaStream;
 };
 
 #endif

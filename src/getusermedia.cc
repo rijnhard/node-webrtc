@@ -1,7 +1,8 @@
-#include <node.h>
-#include <v8.h>
+#include "getusermedia.h"
 
-#include "talk/app/webrtc/peerconnectioninterface.h"
+#include "webrtc/api/mediastreaminterface.h"
+#include "webrtc/api/peerconnectioninterface.h"
+#include "webrtc/base/scoped_ref_ptr.h"
 
 #include "common.h"
 #include "mediastream.h"

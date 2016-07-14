@@ -1,12 +1,10 @@
-#include <node_buffer.h>
-
-#include "talk/app/webrtc/jsep.h"
-#include "webrtc/system_wrappers/interface/ref_count.h"
-
-#include "common.h"
 #include "mediastreamtrack.h"
 
-using namespace node;
+#include "webrtc/api/jsep.h"
+#include "webrtc/base/refcount.h"
+
+#include "common.h"
+
 using v8::Boolean;
 using v8::External;
 using v8::Function;
