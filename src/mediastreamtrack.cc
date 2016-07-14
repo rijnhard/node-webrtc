@@ -69,8 +69,10 @@ void MediaStreamTrack::QueueEvent(AsyncEventType type, void* data)
 
 void MediaStreamTrack::Run(uv_async_t* handle, int status)
 {
-  TRACE_CALL;
-    MediaStreamTrack* self = static_cast<MediaStreamTrack*>(handle->data);
+  Nan::HandleScope scope;
+
+  MediaStreamTrack* self = static_cast<MediaStreamTrack*>(handle->data);
+  TRACE_CALL_P((uintptr_t)self);
   Local<Object> mst = self->handle();
 
   while(true)
@@ -137,7 +139,7 @@ void MediaStreamTrack::Run(uv_async_t* handle, int status)
     }
 
   }
-  scope.Close(Undefined());
+
   TRACE_END;
 }
 
