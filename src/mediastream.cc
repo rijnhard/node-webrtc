@@ -5,9 +5,11 @@
 #include "common.h"
 #include "mediastreamtrack.h"
 
+using v8::Array;
 using v8::Boolean;
 using v8::External;
 using v8::Function;
+using v8::FunctionTemplate;
 using v8::Handle;
 using v8::Local;
 using v8::Object;
@@ -21,7 +23,7 @@ MediaStream::MediaStream(webrtc::MediaStreamInterface* msi)
 {
   _inactive = !IsMediaStreamActive();
   uv_mutex_init(&lock);
-  uv_async_init(uv_default_loop(), &async, Run);
+  uv_async_init(uv_default_loop(), &async, reinterpret_cast<uv_async_cb>(Run));
 
   async.data = this;
 }
@@ -302,7 +304,7 @@ NAN_SETTER(MediaStream::ReadOnly) {
 
 
 void MediaStream::Init(Handle<Object> exports) {
-  Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
+  Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
   tpl->SetClassName(Nan::New("MediaStream").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 

@@ -8,6 +8,7 @@
 using v8::Boolean;
 using v8::External;
 using v8::Function;
+using v8::FunctionTemplate;
 using v8::Handle;
 using v8::Local;
 using v8::Object;
@@ -23,7 +24,7 @@ MediaStreamTrack::MediaStreamTrack(webrtc::MediaStreamTrackInterface* msti)
   _muted = false;
   _live = _internalMediaStreamTrack->state() == webrtc::MediaStreamTrackInterface::kLive;
   uv_mutex_init(&lock);
-  uv_async_init(uv_default_loop(), &async, Run);
+  uv_async_init(uv_default_loop(), &async, reinterpret_cast<uv_async_cb>(Run));
 
   async.data = this;
 }
@@ -203,25 +204,25 @@ NAN_GETTER(MediaStreamTrack::GetEnabled) {
   bool enabled = self->_internalMediaStreamTrack->enabled();
 
   TRACE_END;
-  info.GetReturnValue().Set(Nan::New<Boolean>(enabled))
+  info.GetReturnValue().Set(Nan::New<Boolean>(enabled));
 }
 
 NAN_GETTER(MediaStreamTrack::GetMuted) {
   TRACE_CALL;
     TRACE_END;
-  info.GetReturnValue().Set(Nan::False())
+  info.GetReturnValue().Set(Nan::False());
 }
 
 NAN_GETTER(MediaStreamTrack::GetReadOnly) {
   TRACE_CALL;
     TRACE_END;
-  info.GetReturnValue().Set(Nan::False())
+  info.GetReturnValue().Set(Nan::False());
 }
 
 NAN_GETTER(MediaStreamTrack::GetRemote) {
   TRACE_CALL;
     TRACE_END;
-  info.GetReturnValue().Set(Nan::False())
+  info.GetReturnValue().Set(Nan::False());
 }
 
 NAN_GETTER(MediaStreamTrack::GetReadyState) {
@@ -232,7 +233,7 @@ NAN_GETTER(MediaStreamTrack::GetReadyState) {
   webrtc::MediaStreamTrackInterface::TrackState state = self->_internalMediaStreamTrack->state();
 
   TRACE_END;
-  info.GetReturnValue().Set(Nan::New<Number>(static_cast<uint32_t>(state)))
+  info.GetReturnValue().Set(Nan::New<Number>(static_cast<uint32_t>(state)));
 }
 
 NAN_SETTER(MediaStreamTrack::SetEnabled) {
@@ -249,7 +250,7 @@ NAN_SETTER(MediaStreamTrack::ReadOnly) {
 }
 
 void MediaStreamTrack::Init( Handle<Object> exports ) {
-  Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
+  Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
   tpl->SetClassName(Nan::New("MediaStreamTrack").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 

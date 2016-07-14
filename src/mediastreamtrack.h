@@ -2,6 +2,7 @@
 #define __MEDIASTREAMTRACK_H__
 
 #include <string>
+#include <queue>
 
 #include "nan.h"
 #include "uv.h"
