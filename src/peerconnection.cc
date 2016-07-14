@@ -181,7 +181,7 @@ void PeerConnection::Run(uv_async_t* handle, int status) {
       Local<Value> argv[1];
       argv[0] = dc;
       Nan::MakeCallback(pc, callback, 1, argv);
-    } else if(PeerConnection::NOTIFY_ADD_STREAM & evt.type) {
+    } else if (PeerConnection::NOTIFY_ADD_STREAM & evt.type) {
       webrtc::MediaStreamInterface* msi = static_cast<webrtc::MediaStreamInterface*>(evt.data);
       Local<Value> cargv[1];
       cargv[0] = Nan::New<External>(static_cast<void*>(msi));
@@ -194,7 +194,7 @@ void PeerConnection::Run(uv_async_t* handle, int status) {
         argv[0] = ms;
         Nan::MakeCallback(pc, callback, 1, argv);
       }
-    } else if(PeerConnection::NOTIFY_REMOVE_STREAM & evt.type) {
+    } else if (PeerConnection::NOTIFY_REMOVE_STREAM & evt.type) {
       webrtc::MediaStreamInterface* msi = static_cast<webrtc::MediaStreamInterface*>(evt.data);
       Local<Value> cargv[1];
       cargv[0] = Nan::New<External>(static_cast<void*>(msi));
@@ -207,6 +207,7 @@ void PeerConnection::Run(uv_async_t* handle, int status) {
         argv[0] = ms;
         Nan::MakeCallback(pc, callback, 1, argv);
       }
+  	}	
   }
 
   if (do_shutdown) {
