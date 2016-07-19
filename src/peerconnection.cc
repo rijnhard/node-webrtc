@@ -658,7 +658,6 @@ void PeerConnection::Init(rtc::Thread* signalingThread, rtc::Thread* workerThrea
   Nan::SetPrototypeMethod(tpl, "getStreamById", GetStreamById);
   Nan::SetPrototypeMethod(tpl, "addStream", AddStream);
   Nan::SetPrototypeMethod(tpl, "removeStream", RemoveStream);
-  Nan::SetPrototypeMethod(tpl, "addStream", AddStream);
   Nan::SetPrototypeMethod(tpl, "close", Close);
 
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("localDescription").ToLocalChecked(), GetLocalDescription, ReadOnly);
